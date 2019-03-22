@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6458702C30B2D356421EAFF8 /* Pods_SwiftSheets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35984165CAFBD8A05F69087A /* Pods_SwiftSheets.framework */; };
+		A123C364224468EF003DD302 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A123C363224468EF003DD302 /* GoogleService-Info.plist */; };
 		A19BD3392242CEE000B2D893 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19BD3382242CEE000B2D893 /* AppDelegate.swift */; };
 		A19BD33B2242CEE000B2D893 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19BD33A2242CEE000B2D893 /* ViewController.swift */; };
 		A19BD33E2242CEE000B2D893 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A19BD33C2242CEE000B2D893 /* Main.storyboard */; };
@@ -15,6 +17,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		35984165CAFBD8A05F69087A /* Pods_SwiftSheets.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftSheets.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		746381AA5045ABB87664782F /* Pods-SwiftSheets.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftSheets.debug.xcconfig"; path = "Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets.debug.xcconfig"; sourceTree = "<group>"; };
+		A123C363224468EF003DD302 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A19BD3352242CEE000B2D893 /* SwiftSheets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftSheets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A19BD3382242CEE000B2D893 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A19BD33A2242CEE000B2D893 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +27,8 @@
 		A19BD33F2242CEE100B2D893 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A19BD3422242CEE100B2D893 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A19BD3442242CEE100B2D893 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1B585802244719D00EAE6BC /* SwiftSheets-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftSheets-Bridging-Header.h"; sourceTree = "<group>"; };
+		D86F8A7F0DD366092DC8E306 /* Pods-SwiftSheets.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftSheets.release.xcconfig"; path = "Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +36,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6458702C30B2D356421EAFF8 /* Pods_SwiftSheets.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7A85BE77E5D4205CC284E02A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				35984165CAFBD8A05F69087A /* Pods_SwiftSheets.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A19BD32C2242CEE000B2D893 = {
 			isa = PBXGroup;
 			children = (
 				A19BD3372242CEE000B2D893 /* SwiftSheets */,
 				A19BD3362242CEE000B2D893 /* Products */,
+				D9C7332D2F77CC98381C7155 /* Pods */,
+				7A85BE77E5D4205CC284E02A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,9 +77,20 @@
 				A19BD33C2242CEE000B2D893 /* Main.storyboard */,
 				A19BD33F2242CEE100B2D893 /* Assets.xcassets */,
 				A19BD3412242CEE100B2D893 /* LaunchScreen.storyboard */,
+				A123C363224468EF003DD302 /* GoogleService-Info.plist */,
 				A19BD3442242CEE100B2D893 /* Info.plist */,
+				A1B585802244719D00EAE6BC /* SwiftSheets-Bridging-Header.h */,
 			);
 			path = SwiftSheets;
+			sourceTree = "<group>";
+		};
+		D9C7332D2F77CC98381C7155 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				746381AA5045ABB87664782F /* Pods-SwiftSheets.debug.xcconfig */,
+				D86F8A7F0DD366092DC8E306 /* Pods-SwiftSheets.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +100,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A19BD3472242CEE100B2D893 /* Build configuration list for PBXNativeTarget "SwiftSheets" */;
 			buildPhases = (
+				01B0F2B5B92ED1AE32D8BDBC /* [CP] Check Pods Manifest.lock */,
 				A19BD3312242CEE000B2D893 /* Sources */,
 				A19BD3322242CEE000B2D893 /* Frameworks */,
 				A19BD3332242CEE000B2D893 /* Resources */,
+				A3D69DAB734EDDE474611C7B /* [CP] Copy Pods Resources */,
+				3C5E6D36E5B63041CE8BC6A6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -123,12 +155,86 @@
 			buildActionMask = 2147483647;
 			files = (
 				A19BD3432242CEE100B2D893 /* LaunchScreen.storyboard in Resources */,
+				A123C364224468EF003DD302 /* GoogleService-Info.plist in Resources */,
 				A19BD3402242CEE100B2D893 /* Assets.xcassets in Resources */,
 				A19BD33E2242CEE000B2D893 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		01B0F2B5B92ED1AE32D8BDBC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiftSheets-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3C5E6D36E5B63041CE8BC6A6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A3D69DAB734EDDE474611C7B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SwiftSheets/Pods-SwiftSheets-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A19BD3312242CEE000B2D893 /* Sources */ = {
@@ -280,16 +386,21 @@
 		};
 		A19BD3482242CEE100B2D893 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 746381AA5045ABB87664782F /* Pods-SwiftSheets.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MJGRJBXP25;
 				INFOPLIST_FILE = SwiftSheets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.quarrylane.frc.SwiftSheets;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.wild.swiftsheets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SwiftSheets/SwiftSheets-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -297,16 +408,21 @@
 		};
 		A19BD3492242CEE100B2D893 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D86F8A7F0DD366092DC8E306 /* Pods-SwiftSheets.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MJGRJBXP25;
 				INFOPLIST_FILE = SwiftSheets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.quarrylane.frc.SwiftSheets;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.wild.swiftsheets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SwiftSheets/SwiftSheets-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
