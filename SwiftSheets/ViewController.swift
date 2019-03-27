@@ -50,7 +50,7 @@ class ViewController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
             self.signInButton.isHidden = true
             self.output.isHidden = false
             self.service.authorizer = user.authentication.fetcherAuthorizer()
-            listMajors()
+            appendTestData()
         }
     }
 
@@ -60,13 +60,9 @@ class ViewController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
     func listMajors() {
         output.text = "Getting sheet data..."
         let spreadsheetId = "1ihIqjfyrQxWYw8YMFR2Z7aKJuv65Z4lUhxn8Eug2CCE"
-        let range = "Team Name!A2:E"
+        let range = "A1:Q"
         let query = GTLRSheetsQuery_SpreadsheetsValuesGet
             .query(withSpreadsheetId: spreadsheetId, range:range)
-//        service.executeQuery(query,
-//                             delegate: self,
-//                             didFinish: Selector("displayResultWithTicket:finishedWithObject:error:")
-//        )
         
         service.executeQuery(query) { (ticket, result, error) in
             
@@ -79,7 +75,6 @@ class ViewController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
                 return
             }
             
-            var majorsString = ""
             let rows = result.values!
             
             if rows.isEmpty {
@@ -87,15 +82,26 @@ class ViewController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
                 return
             }
             
-            majorsString += "Name, Major:\n"
-            for row in rows {
-                let name = row[0]
-                let major = row[4]
-                
-                majorsString += "\(name), \(major)\n"
-            }
+            self.output.text = "Number of rows in sheet: \(rows.count)"
+        }
+    }
+    
+    func appendTestData() {
+        output.text = "Appending data..."
+        let spreadsheetId = "1ihIqjfyrQxWYw8YMFR2Z7aKJuv65Z4lUhxn8Eug2CCE"
+        let range = "A1:Q"
+        let rangeToAppend = GTLRSheets_ValueRange.init();
+        rangeToAppend.values = [["Test", "Test2", "Test3"]]
+        let query = GTLRSheetsQuery_SpreadsheetsValuesAppend.query(withObject: rangeToAppend, spreadsheetId: spreadsheetId, range: range)
+        query.valueInputOption = "USER_ENTERED"
+        
+        service.executeQuery(query) { (ticket, result, error) in
             
-            self.output.text = majorsString
+            if let error = error {
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            } else {
+                self.output.text = "Success!"
+            }
         }
     }
 
