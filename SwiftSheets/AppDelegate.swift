@@ -25,6 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
 
         Task {
+            // We try to restore the signed-in user from the device Keychain (secure store)
             signedInUser = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
         }
         return true
@@ -63,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate {
     // MARK: - Google Sign-in Support
     // (Could also have this in a helper class instead of in the AppDelegate)
+    /// Asynchronously attempts to sign in or restore a user's session. Will pop up an authentication browser as needed.
     @discardableResult
     func signInOrRestore(presenting viewController: UIViewController) async throws -> GIDGoogleUser {
         var user: GIDGoogleUser!
@@ -76,6 +78,7 @@ extension AppDelegate {
         return user
     }
     
+    /// Sign out the user
     func signOut() {
         GIDSignIn.sharedInstance.signOut()
         signedInUser = nil
@@ -117,6 +120,14 @@ extension GIDSignIn {
     var config: GIDConfiguration {
         GIDConfiguration(clientID: Bundle.main.googleSignInPlist["CLIENT_ID"] ?? "")
     }
+    
+    /*
+     Below are just some wrapper functions I made in order to use the older-style API from the GoogleSignIn
+     library with some new Swift 5.5 featues (async/await)
+     
+     Else we would have to use nested completion handlers and other stuff. This way, it's easier to read but
+     async/await comes with a learning curve.
+     */
     
     func restorePreviousSignIn() async throws -> GIDGoogleUser {
         try await withCheckedThrowingContinuation { continuation in
