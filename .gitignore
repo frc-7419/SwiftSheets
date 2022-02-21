@@ -3,3 +3,5 @@ Pods
 *.xcuserdatad
 *.xcworkspace
 /.DS_Store
+
+GoogleService-Info.plist
