@@ -8,41 +8,33 @@
 
 import UIKit
 import GoogleSignIn
-import Google
-import Firebase
+import GoogleAPIClientForREST_Sheets
+import Combine
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    // MARK: - Properties
+    
     var window: UIWindow?
-
+    @Published var signedInUser: GIDGoogleUser?
+    
+    // MARK: - App Lifecycle
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
-        // Initialize sign-in
-//        var configureError: NSError?
-//        GGLContext.sharedInstance().configureWithError(&configureError)
-        
-//        assert(configureError == nil, "Error configuring Google services: \(configureError)")
-        FIRApp.configure()
+        Task {
+            signedInUser = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+        }
         return true
     }
-
-    func application(_ application: UIApplication,
-                     open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-        return GIDSignIn.sharedInstance().handle(url,
-                sourceApplication: sourceApplication,
-                annotation: annotation)
-    }
-
-    @available(iOS 9.0, *)
+    
     func application(_ app: UIApplication, open url: URL,
                      options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-        let sourceApplication = options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String
-        let annotation = options[UIApplication.OpenURLOptionsKey.annotation]
-        return GIDSignIn.sharedInstance().handle(url,
-                sourceApplication: sourceApplication,
-                annotation: annotation)
+        return GIDSignIn.sharedInstance.handle(url)
+        // We could potentially have more URL handling parts of the code, so it's wise to check the return code of the `handle(_:)` call above.
+        // However in this demo we will not have any more URL handlers
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -66,7 +58,123 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 
+extension AppDelegate {
+    // MARK: - Google Sign-in Support
+    // (Could also have this in a helper class instead of in the AppDelegate)
+    @discardableResult
+    func signInOrRestore(presenting viewController: UIViewController) async throws -> GIDGoogleUser {
+        var user: GIDGoogleUser!
+        do {
+            user = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+        } catch {
+            user = try await GIDSignIn.sharedInstance.signIn(presenting: viewController)
+        }
+        
+        signedInUser = user
+        return user
+    }
+    
+    func signOut() {
+        GIDSignIn.sharedInstance.signOut()
+        signedInUser = nil
+    }
+}
+
+// MARK: - Helper Extensions
+
+extension UIApplication {
+    static var appDelegate: AppDelegate {
+        UIApplication.shared.delegate as! AppDelegate
+    }
+}
+
+extension Bundle {
+    var googleSignInPlist: [String: String] {
+        guard
+            let plistPath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+            let plistData = try? Data(contentsOf: URL(fileURLWithPath: plistPath))
+        else {
+            preconditionFailure("Developer error, check if GoogleService-Info.plist is included in bundle!")
+        }
+        
+        guard let plist = try? PropertyListSerialization.propertyList(from: plistData, options: .mutableContainers, format: nil) as? [String: String] else {
+            preconditionFailure("Developer error, check if GoogleService-Info.plist is correctly formatted")
+        }
+        
+        return plist ?? [:]
+    }
+}
+
+extension GIDGoogleUser {
+    var hasSheetsScope: Bool {
+        grantedScopes?.contains(kGTLRAuthScopeSheetsSpreadsheets) ?? false
+    }
+}
+
+extension GIDSignIn {
+    var config: GIDConfiguration {
+        GIDConfiguration(clientID: Bundle.main.googleSignInPlist["CLIENT_ID"] ?? "")
+    }
+    
+    func restorePreviousSignIn() async throws -> GIDGoogleUser {
+        try await withCheckedThrowingContinuation { continuation in
+            restorePreviousSignIn { user, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let user = user {
+                    continuation.resume(returning: user)
+                } else {
+                    continuation.resume(throwing: NSError(domain: GIDSignInError.errorDomain, code: GIDSignInError.unknown.rawValue, userInfo: nil))
+                }
+            }
+        }
+    }
+    
+    func signIn(presenting viewController: UIViewController) async throws -> GIDGoogleUser {
+        try await withCheckedThrowingContinuation { continuation in
+            let config = self.config
+            DispatchQueue.main.async {
+                // Calls to this function from the `catch` in `signInOrRestore(_:)` above may not run on the main thread.
+                // Explicitly dispatch to main as a workaround
+                self.signIn(with: config, presenting: viewController) { user, error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                        return
+                    } else if let user = user {
+                        continuation.resume(returning: user)
+                    } else {
+                        continuation.resume(throwing: NSError(domain: GIDSignInError.errorDomain, code: GIDSignInError.unknown.rawValue, userInfo: nil))
+                    }
+                }
+            }
+        }
+    }
+    
+    func addScopes(scopes: [String], presenting viewController: UIViewController) async throws -> GIDGoogleUser {
+        try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.main.async {
+                // Calls to this function from the `catch` in `signInOrRestore(_:)` above may not run on the main thread.
+                // Explicitly dispatch to main as a workaround
+                self.addScopes(scopes, presenting: viewController) { user, error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                        return
+                    } else if let user = user {
+                        for requestedScope in scopes {
+                            if !(user.grantedScopes?.contains(requestedScope) ?? false) {
+                                continuation.resume(throwing: NSError(domain: GIDSignInError.errorDomain, code: GIDSignInError.Code.canceled.rawValue, userInfo: nil))
+                                return
+                            }
+                        }
+                        UIApplication.appDelegate.signedInUser = user
+                        continuation.resume(returning: user)
+                    } else {
+                        continuation.resume(throwing: NSError(domain: GIDSignInError.errorDomain, code: GIDSignInError.unknown.rawValue, userInfo: nil))
+                    }
+                }
+            }
+        }
+    }
+}

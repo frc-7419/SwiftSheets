@@ -9,7 +9,7 @@
 #ifndef SwiftSheets_Bridging_Header_h
 #define SwiftSheets_Bridging_Header_h
 
-#import <GTMSessionFetcher/GTMSessionFetcher.h>
-#import <GTMSessionFetcher/GTMSessionFetcherService.h>
+//#import <GTMSessionFetcher/GTMSessionFetcher.h>
+//#import <GTMSessionFetcher/GTMSessionFetcherService.h>
 
 #endif /* SwiftSheets_Bridging_Header_h */

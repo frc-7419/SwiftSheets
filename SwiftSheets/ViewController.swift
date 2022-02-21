@@ -6,150 +6,98 @@
 //  Copyright © 2019 SAP SE. All rights reserved.
 //
 
-import GoogleAPIClientForREST
+import GoogleAPIClientForREST_Sheets
 import GoogleSignIn
 import UIKit
+import Combine
+import GTMSessionFetcherCore
 
-class ViewController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate {
-
-    // If modifying these scopes, delete your previously saved credentials by
-    // resetting the iOS simulator or uninstall the app. kGTLRAuthScopeSheetsSpreadsheetsReadonly
-    private let scopes = [kGTLRAuthScopeSheetsSpreadsheets]
-
+class ViewController: UIViewController {
+    
     private let service = GTLRSheetsService()
-    let signInButton = GIDSignInButton()
-    let output = UITextView()
-
+    private var signedInSubscription: AnyCancellable?
+    
+    @IBOutlet weak var output: UITextView!
+    @IBOutlet weak var signInButton: UIButton!
+    @IBOutlet weak var appendDataButton: UIButton!
+    @IBOutlet weak var logoutButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Configure Google Sign-in.
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance().uiDelegate = self
-        GIDSignIn.sharedInstance().scopes = scopes
-        GIDSignIn.sharedInstance().signInSilently()
-
-        // Add the sign-in button.
-        view.addSubview(signInButton)
-
-        // Add a UITextView to display output.
-        output.frame = view.bounds
-        output.isEditable = false
-        output.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
-        output.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        output.isHidden = true
-        view.addSubview(output);
-    }
-
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!,
-              withError error: Error!) {
-        if let error = error {
-            showAlert(title: "Authentication Error", message: error.localizedDescription)
-            self.service.authorizer = nil
-        } else {
-            self.signInButton.isHidden = true
-            self.output.isHidden = false
-            self.service.authorizer = user.authentication.fetcherAuthorizer()
-            appendTestData()
-        }
-    }
-
-    // Display (in the UITextView) the names and majors of students in a sample
-    // spreadsheet:
-    // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-    func listMajors() {
-        output.text = "Getting sheet data..."
-        let spreadsheetId = "1ihIqjfyrQxWYw8YMFR2Z7aKJuv65Z4lUhxn8Eug2CCE"
-        let range = "A1:Q"
-        let query = GTLRSheetsQuery_SpreadsheetsValuesGet
-            .query(withSpreadsheetId: spreadsheetId, range:range)
         
-        service.executeQuery(query) { (ticket, result, error) in
-            
-            if let error = error {
-                self.showAlert(title: "Error", message: error.localizedDescription)
-                return
+        signedInSubscription = UIApplication.appDelegate.$signedInUser.sink { [unowned self] user in
+            if user != nil {
+                signInButton.isEnabled = false
+                appendDataButton.isEnabled = true
+                logoutButton.isEnabled = true
+                output.text =
+                """
+                Signed in!
+                User granted scopes: \(user?.grantedScopes?.joined(separator: "\n") ?? "none")
+                """
+                // Enable later API calls to be authorized.
+                // The below will add the correct headers to the outgoing request
+                service.authorizer = user?.authentication.fetcherAuthorizer()
+            } else {
+                output.text = "Not signed in."
+                signInButton.isEnabled = true
+                appendDataButton.isEnabled = false
+                logoutButton.isEnabled = false
             }
-            
-            guard let result = result as? GTLRSheets_ValueRange else {
-                return
-            }
-            
-            let rows = result.values!
-            
-            if rows.isEmpty {
-                self.output.text = "No data found."
-                return
-            }
-            
-            self.output.text = "Number of rows in sheet: \(rows.count)"
         }
     }
     
-    func appendTestData() {
-        output.text = "Appending data..."
-        let spreadsheetId = "1ihIqjfyrQxWYw8YMFR2Z7aKJuv65Z4lUhxn8Eug2CCE"
-        let range = "A1:Q"
-        let rangeToAppend = GTLRSheets_ValueRange.init();
-        rangeToAppend.values = [["Test", "Test2", "Test3"]]
-        let query = GTLRSheetsQuery_SpreadsheetsValuesAppend.query(withObject: rangeToAppend, spreadsheetId: spreadsheetId, range: range)
-        query.valueInputOption = "USER_ENTERED"
-        
-        service.executeQuery(query) { (ticket, result, error) in
+    @IBAction func signInWithGoogle(_ sender: Any) {
+        Task {
+            try? await UIApplication.appDelegate.signInOrRestore(presenting: self)
+            // signedInSubscription will handle changing UI
+        }
+    }
+    
+    @IBAction func onAppendDataButtonPress(_ sender: Any) {
+        Task {
+            // Before we call the API it is best practice to ensure the needed scope is granted.
+            // As of now, we cannot ask the user for a scope as part of the initial sign-in.
+            if !(UIApplication.appDelegate.signedInUser?.hasSheetsScope ?? false) {
+                _ = try? await GIDSignIn.sharedInstance.addScopes(scopes: [kGTLRAuthScopeSheetsSpreadsheets], presenting: self)
+            }
+            // Scopes have been granted...or the user cancelled at which point the below will fail
             
-            if let error = error {
-                self.showAlert(title: "Error", message: error.localizedDescription)
-            } else {
-                self.output.text = "Success!"
+            output.text = "Appending data..."
+            let spreadsheetId = "1_3wMHPrS2Wv_cfSmCq53yKdpecHgc8tyy71nwGv4jnk"
+            let range = "A2:AA"
+            let rangeToAppend = GTLRSheets_ValueRange.init();
+            rangeToAppend.values = [["Test", "Test2", "Test3"]]
+            let query = GTLRSheetsQuery_SpreadsheetsValuesAppend.query(withObject: rangeToAppend, spreadsheetId: spreadsheetId, range: range)
+            query.valueInputOption = "USER_ENTERED"
+            
+            service.executeQuery(query) { (ticket, result, error) in
+                
+                if let error = error {
+                    self.showAlert(title: "Error", message: error.localizedDescription)
+                } else {
+                    self.output.text = "Success!"
+                }
             }
         }
     }
-
-    // Process the response and display output
-    func displayResultWithTicket(ticket: GTLRServiceTicket,
-                                 finishedWithObject result : GTLRSheets_ValueRange,
-                                 error : NSError?) {
-
-        if let error = error {
-            showAlert(title: "Error", message: error.localizedDescription)
-            return
-        }
-
-        var majorsString = ""
-        let rows = result.values!
-
-        if rows.isEmpty {
-            output.text = "No data found."
-            return
-        }
-
-        majorsString += "Name, Major:\n"
-        for row in rows {
-            let name = row[0]
-            let major = row[4]
-
-            majorsString += "\(name), \(major)\n"
-        }
-
-        output.text = majorsString
+    
+    @IBAction func onLogoutPress(_ sender: Any) {
+        UIApplication.appDelegate.signOut()
     }
-
-
-
     // Helper for showing an alert
     func showAlert(title : String, message: String) {
         let alert = UIAlertController(
-                title: title,
-                message: message,
-                preferredStyle: UIAlertController.Style.alert
+            title: title,
+            message: message,
+            preferredStyle: UIAlertController.Style.alert
         )
         let ok = UIAlertAction(
-                title: "OK",
-                style: UIAlertAction.Style.default,
-                handler: nil
+            title: "OK",
+            style: UIAlertAction.Style.default,
+            handler: nil
         )
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
     }
 }
-
